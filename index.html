@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Starter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2c1810, #5d4037);
+            color: #f5f5dc;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #ff6b35;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+        
+        .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .input-group {
+            margin-bottom: 30px;
+        }
+        
+        .input-group h3 {
+            margin-bottom: 15px;
+            color: #ff6b35;
+        }
+        
+        .slider-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #ff6b35;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #ff6b35;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #ff6b35;
+        }
+        
+        .radio-group {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .radio-option input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+            accent-color: #ff6b35;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff6b35, #ff8a50);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(255, 107, 53, 0.3);
+        }
+        
+        .recipe-page {
+            display: none;
+        }
+        
+        .recipe-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .fire-illustration {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+            background: radial-gradient(circle, #ff6b35, #2c1810);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .materials {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .materials h3 {
+            color: #ff6b35;
+            margin-bottom: 20px;
+        }
+        
+        .material-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .material-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .material-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px;
+            background: rgba(255, 107, 53, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .recipe-steps {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .step {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step h4 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .step-content {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .step-illustration {
+            width: 200px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff6b35;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 107, 53, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .step-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .material-list {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Input Page -->
+        <div id="inputPage" class="input-page">
+            <h1>🔥 Fire Starter</h1>
+            <p class="subtitle">Build the perfect fire for your needs</p>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <h3>Desired Burn Time</h3>
+                    <div class="slider-container">
+                        <input type="range" id="burnTime" class="slider" min="10" max="180" value="60">
+                        <div class="slider-value" id="burnTimeValue">1 hour</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <h3>Number of People</h3>
+                    <div class="slider-container">
+                        <input type="range" id="peopleCount" class="slider" min="1" max="8" value="4">
+                        <div class="slider-value" id="peopleCountValue">4 people</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <h3>Purpose of Fire</h3>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="purpose" value="warmth">
+                            <span>Warmth - Keep cozy and comfortable</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="purpose" value="cooking" checked>
+                            <span>Cooking - Prepare meals and heat food</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="purpose" value="ambiance">
+                            <span>Ambiance - Relaxing atmosphere and socializing</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <h3>Fire Infrastructure</h3>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="infrastructure" value="no-area">
+                            <span>No designated fire area</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="infrastructure" value="fire-ring" checked>
+                            <span>Outdoor fire ring</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="infrastructure" value="fireplace">
+                            <span>Indoor fireplace</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="infrastructure" value="metal-pit">
+                            <span>Outdoor metal fire pit</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="infrastructure" value="wood-stove">
+                            <span>Wood stove</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="generate-btn" onclick="generateRecipe()">Generate My Fire Recipe</button>
+            </div>
+        </div>
+        
+        <!-- Recipe Page -->
+        <div id="recipePage" class="recipe-page">
+            <button class="back-btn" onclick="goBack()">← Back to Inputs</button>
+            
+            <div class="recipe-header">
+                <h2 id="recipeTitle">Your Custom Fire Recipe</h2>
+                <div class="fire-illustration" id="fireIllustration">
+                    <div style="font-size: 48px;">🔥</div>
+                </div>
+                <p id="fireDescription"></p>
+            </div>
+            
+            <div class="materials">
+                <h3>Materials Needed</h3>
+                <div class="material-list" id="materialsList"></div>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255, 107, 53, 0.2); border-radius: 8px;">
+                    <strong>Safety Note:</strong> <span id="safetyNote"></span>
+                </div>
+            </div>
+            
+            <div class="recipe-steps">
+                <h3>Building Instructions</h3>
+                <div id="stepsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update slider values
+        document.getElementById('burnTime').addEventListener('input', function() {
+            const value = this.value;
+            const hours = Math.floor(value / 60);
+            const minutes = value % 60;
+            let display = '';
+            if (hours > 0) {
+                display += hours + (hours === 1 ? ' hour' : ' hours');
+                if (minutes > 0) display += ' ' + minutes + ' min';
+            } else {
+                display = minutes + ' minutes';
+            }
+            document.getElementById('burnTimeValue').textContent = display;
+        });
+
+        document.getElementById('peopleCount').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('peopleCountValue').textContent = value + (value === '1' ? ' person' : ' people');
+        });
+
+        function generateRecipe() {
+            const burnTime = parseInt(document.getElementById('burnTime').value);
+            const peopleCount = parseInt(document.getElementById('peopleCount').value);
+            const purpose = document.querySelector('input[name="purpose"]:checked').value;
+            const infrastructure = document.querySelector('input[name="infrastructure"]:checked').value;
+            
+            const recipe = createFireRecipe(burnTime, peopleCount, purpose, infrastructure);
+            displayRecipe(recipe);
+            
+            document.getElementById('inputPage').style.display = 'none';
+            document.getElementById('recipePage').style.display = 'block';
+        }
+
+        function goBack() {
+            document.getElementById('inputPage').style.display = 'block';
+            document.getElementById('recipePage').style.display = 'none';
+        }
+
+        function createFireRecipe(burnTime, peopleCount, purpose, infrastructure) {
+            const recipe = {
+                title: '',
+                description: '',
+                illustration: '',
+                materials: [],
+                steps: [],
+                safetyNote: ''
+            };
+            
+            // Determine fire structure based on purpose
+            let fireStructure = '';
+            if (purpose === 'cooking') {
+                fireStructure = 'log-cabin';
+                recipe.title = 'Log Cabin Cooking Fire';
+                recipe.description = 'A stable, even-burning fire perfect for cooking with consistent heat and a flat bed of coals.';
+                recipe.illustration = '🔥 Log Cabin View';
+            } else if (purpose === 'warmth') {
+                fireStructure = 'teepee';
+                recipe.title = 'Teepee Warmth Fire';
+                recipe.description = 'A tall, hot-burning fire that radiates heat in all directions for maximum warmth.';
+                recipe.illustration = '🔥 Teepee View';
+            } else { // ambiance
+                fireStructure = 'lean-to';
+                recipe.title = 'Lean-To Ambiance Fire';
+                recipe.description = 'A controlled, atmospheric fire perfect for relaxing and socializing with a beautiful flame display.';
+                recipe.illustration = '🔥 Lean-To View';
+            }
+            
+            // Calculate materials based on burn time and people count
+            const baseMultiplier = Math.max(1, peopleCount / 4);
+            const timeMultiplier = burnTime / 60; // hours
+            
+            recipe.materials = [
+                {
+                    name: 'Tinder',
+                    amount: '2-3 handfuls',
+                    icon: '🍂',
+                    description: 'Dry grass, paper, birch bark'
+                },
+                {
+                    name: 'Kindling',
+                    amount: Math.ceil(10 * baseMultiplier) + ' pieces',
+                    icon: '🪵',
+                    description: 'Pencil to thumb thickness'
+                },
+                {
+                    name: 'Small Logs',
+                    amount: Math.ceil(8 * baseMultiplier * timeMultiplier) + ' pieces',
+                    icon: '🪓',
+                    description: '1-2 inch diameter'
+                },
+                {
+                    name: 'Medium Logs',
+                    amount: Math.ceil(6 * baseMultiplier * timeMultiplier) + ' pieces',
+                    icon: '🌳',
+                    description: '3-4 inch diameter'
+                },
+                {
+                    name: 'Large Logs',
+                    amount: Math.ceil(4 * baseMultiplier * timeMultiplier) + ' pieces',
+                    icon: '🪵',
+                    description: '5+ inch diameter'
+                },
+                {
+                    name: 'Water',
+                    amount: Math.ceil(2 * baseMultiplier) + ' gallons',
+                    icon: '💧',
+                    description: 'For extinguishing'
+                },
+                {
+                    name: 'Lighter/Matches',
+                    amount: '1 set',
+                    icon: '🔥',
+                    description: 'Waterproof preferred'
+                }
+            ];
+            
+            // Generate steps based on fire structure
+            if (fireStructure === 'log-cabin') {
+            } else if (fireStructure === 'log-cabin') {
+                // Standard outdoor log cabin fire for cooking
+                recipe.steps = [
+                    {
+                        title: 'Layer 1: Foundation',
+                        instruction: 'Place two medium logs parallel to each other, about 12 inches apart. This creates the base of your log cabin structure.',
+                        endState: 'Two logs are positioned parallel, creating a foundation with space between them.',
+                        illustration: 'Bird\'s eye: Two parallel lines'
+                    },
+                    {
+                        title: 'Layer 2: Tinder Nest',
+                        instruction: 'In the center space between the logs, create a small nest of tinder. Add kindling in a loose teepee shape around the tinder.',
+                        endState: 'Tinder nest is prepared and kindling forms a small teepee in the center.',
+                        illustration: 'Tinder nest with kindling teepee'
+                    },
+                    {
+                        title: 'Layer 3: Cross Pattern',
+                        instruction: 'Place two more medium logs perpendicular to the first pair, on top of them. Continue alternating directions with each layer.',
+                        endState: 'Logs form a square cabin shape with 2-3 layers built up.',
+                        illustration: 'Cross-hatched log pattern'
+                    },
+                    {
+                        title: 'Layer 4: Ignition',
+                        instruction: 'Light the tinder in the center. As it catches, the kindling will ignite, then the inner parts of the logs.',
+                        endState: 'Fire is burning steadily in the center, with flames beginning to catch the log structure.',
+                        illustration: 'Central fire spreading outward'
+                    },
+                    {
+                        title: 'Layer 5: Maintenance',
+                        instruction: 'As logs burn down, add new logs in the same crisscross pattern. This maintains the flat cooking surface.',
+                        endState: 'Fire burns with consistent coals perfect for cooking, with a stable base of embers.',
+                        illustration: 'Steady cooking coals'
+                    }
+                ];
+            } else if (fireStructure === 'teepee') {
+                recipe.steps = [
+                    {
+                        title: 'Layer 1: Tinder Bundle',
+                        instruction: 'Create a small bundle of tinder in the center of your fire area. This will be the heart of your fire.',
+                        endState: 'A compact bundle of fine tinder is ready to ignite.',
+                        illustration: 'Small central tinder bundle'
+                    },
+                    {
+                        title: 'Layer 2: Kindling Teepee',
+                        instruction: 'Arrange kindling around the tinder in a teepee shape, leaving gaps for airflow. Start with the smallest pieces closest to the tinder.',
+                        endState: 'Kindling forms a cone shape around tinder with good ventilation.',
+                        illustration: 'Kindling teepee structure'
+                    },
+                    {
+                        title: 'Layer 3: Small Log Teepee',
+                        instruction: 'Add small logs around the kindling teepee, maintaining the cone shape but with larger gaps for oxygen.',
+                        endState: 'A larger teepee structure is formed with multiple size gradients.',
+                        illustration: 'Expanded teepee with logs'
+                    },
+                    {
+                        title: 'Layer 4: Ignition',
+                        instruction: 'Light the tinder through the gaps in your teepee. The fire should climb naturally up through the structure.',
+                        endState: 'Fire is burning upward through the teepee, with flames visible at multiple levels.',
+                        illustration: 'Flames climbing through teepee'
+                    },
+                    {
+                        title: 'Layer 5: Building Height',
+                        instruction: 'As the fire establishes, add medium and large logs to maintain the teepee shape, creating maximum heat radiation.',
+                        endState: 'A tall, hot fire providing excellent warmth in all directions.',
+                        illustration: 'Tall teepee fire radiating heat'
+                    }
+                ];
+            } else { // lean-to
+                recipe.steps = [
+                    {
+                        title: 'Layer 1: Backstop Log',
+                        instruction: 'Place one large log as a backstop. This will reflect heat and support the leaning structure.',
+                        endState: 'One large log is positioned to serve as the back wall of your fire.',
+                        illustration: 'Single horizontal log'
+                    },
+                    {
+                        title: 'Layer 2: Tinder Placement',
+                        instruction: 'Place tinder against the backstop log, creating a small nest at the base.',
+                        endState: 'Tinder is positioned against the backstop, ready to ignite.',
+                        illustration: 'Tinder against backstop'
+                    },
+                    {
+                        title: 'Layer 3: Kindling Lean',
+                        instruction: 'Lean kindling against the backstop log at a 45-degree angle, covering the tinder but leaving gaps for air.',
+                        endState: 'Kindling creates an angled roof over the tinder.',
+                        illustration: 'Angled kindling lean-to'
+                    },
+                    {
+                        title: 'Layer 4: Log Lean Structure',
+                        instruction: 'Continue adding progressively larger logs in the same leaning pattern, creating a sloped wall of fuel.',
+                        endState: 'A complete lean-to structure with multiple log sizes.',
+                        illustration: 'Full lean-to structure'
+                    },
+                    {
+                        title: 'Layer 5: Ignition & Ambiance',
+                        instruction: 'Light the tinder at the base. The fire will burn up the lean-to, creating beautiful dancing flames perfect for ambiance.',
+                        endState: 'Fire burns with attractive flames and provides a cozy, atmospheric glow.',
+                        illustration: 'Dancing flames in lean-to'
+                    }
+                ];
+            }
+            
+            // Safety note based on infrastructure
+            if (infrastructure === 'no-area') {
+                recipe.safetyNote = 'Clear a 10-foot radius of flammable materials. Have extra water and a shovel ready. Check local fire restrictions.';
+            } else if (infrastructure === 'fireplace') {
+                recipe.safetyNote = 'Ensure chimney is clean and damper is open. Use a fireplace screen and keep the area clear.';
+            } else {
+                recipe.safetyNote = 'Always keep water nearby for extinguishing. Never leave fire unattended. Fully extinguish before leaving.';
+            }
+            
+            return recipe;
+        }
+
+        function displayRecipe(recipe) {
+            document.getElementById('recipeTitle').textContent = recipe.title;
+            document.getElementById('fireDescription').textContent = recipe.description;
+            document.getElementById('safetyNote').textContent = recipe.safetyNote;
+            
+            // Display materials
+            const materialsList = document.getElementById('materialsList');
+            materialsList.innerHTML = '';
+            recipe.materials.forEach(material => {
+                const materialDiv = document.createElement('div');
+                materialDiv.className = 'material-item';
+                materialDiv.innerHTML = `
+                    <div class="material-icon">${material.icon}</div>
+                    <div><strong>${material.amount}</strong></div>
+                    <div>${material.name}</div>
+                    <div style="font-size: 0.9em; opacity: 0.8;">${material.description}</div>
+                `;
+                materialsList.appendChild(materialDiv);
+            });
+            
+            // Display steps
+            const stepsContainer = document.getElementById('stepsContainer');
+            stepsContainer.innerHTML = '';
+            recipe.steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                stepDiv.innerHTML = `
+                    <h4>Step ${index + 1}: ${step.title}</h4>
+                    <div class="step-content">
+                        <div>
+                            <p><strong>Instructions:</strong> ${step.instruction}</p>
+                            <p style="margin-top: 10px;"><strong>Ready to continue when:</strong> ${step.endState}</p>
+                        </div>
+                        <div class="step-illustration">${step.illustration}</div>
+                    </div>
+                `;
+                stepsContainer.appendChild(stepDiv);
+            });
+        }
+    </script>
+</body>
+</html>
