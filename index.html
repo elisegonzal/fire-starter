@@ -417,6 +417,436 @@
             document.getElementById('inputPage').style.display = 'block';
             document.getElementById('recipePage').style.display = 'none';
         }
+function createFireRecipe(burnTime, peopleCount, purpose, infrastructure) {
+    const recipe = {
+        title: '',
+        description: '',
+        illustration: '',
+        materials: [],
+        steps: [],
+        safetyNote: ''
+    };
+    
+    // Determine optimal fire structure based on purpose AND infrastructure
+    let fireStructure = '';
+    
+    if (infrastructure === 'fireplace') {
+        fireStructure = 'fireplace-cabin';
+        if (purpose === 'warmth') {
+            recipe.title = 'Indoor Fireplace Heat Fire';
+            recipe.description = 'A controlled log cabin fire optimized for indoor fireplaces, providing steady heat and minimal smoke.';
+        } else if (purpose === 'cooking') {
+            recipe.title = 'Indoor Fireplace Cooking Fire';
+            recipe.description = 'A low, stable fire perfect for fireplace cooking with consistent coals and controlled flames.';
+        } else {
+            recipe.title = 'Indoor Fireplace Ambiance Fire';
+            recipe.description = 'A beautiful, atmospheric fire designed for cozy indoor ambiance with dancing flames.';
+        }
+        recipe.illustration = '🔥 Indoor Fireplace';
+    } else if (infrastructure === 'wood-stove') {
+        fireStructure = 'wood-stove';
+        recipe.title = 'Wood Stove Fire';
+        recipe.description = 'An efficient top-down burn optimized for wood stoves, providing long-lasting heat with minimal tending.';
+        recipe.illustration = '🔥 Wood Stove Load';
+    } else if (infrastructure === 'metal-pit') {
+        if (purpose === 'cooking') {
+            fireStructure = 'platform';
+            recipe.title = 'Platform Cooking Fire';
+            recipe.description = 'A flat-topped fire structure perfect for cooking in metal fire pits, creating an even cooking surface.';
+        } else if (purpose === 'warmth') {
+            fireStructure = 'teepee';
+            recipe.title = 'Teepee Warmth Fire';
+            recipe.description = 'A tall, hot-burning fire that maximizes heat radiation in your metal fire pit.';
+        } else {
+            fireStructure = 'log-cabin';
+            recipe.title = 'Log Cabin Ambiance Fire';
+            recipe.description = 'A stable, long-burning fire perfect for socializing around your fire pit.';
+        }
+        recipe.illustration = '🔥 Metal Fire Pit';
+    } else if (infrastructure === 'fire-ring') {
+        if (purpose === 'cooking') {
+            fireStructure = 'log-cabin';
+            recipe.title = 'Log Cabin Cooking Fire';
+            recipe.description = 'A stable, even-burning fire perfect for cooking with consistent heat and a flat bed of coals.';
+        } else if (purpose === 'warmth') {
+            fireStructure = 'teepee';
+            recipe.title = 'Teepee Warmth Fire';
+            recipe.description = 'A tall, hot-burning fire that radiates heat in all directions for maximum warmth.';
+        } else {
+            fireStructure = 'lean-to';
+            recipe.title = 'Lean-To Ambiance Fire';
+            recipe.description = 'A controlled, atmospheric fire perfect for relaxing and socializing with beautiful flame display.';
+        }
+        recipe.illustration = '🔥 Fire Ring';
+    } else { // no-area
+        if (purpose === 'cooking') {
+            fireStructure = 'parallel';
+            recipe.title = 'Parallel Log Cooking Fire';
+            recipe.description = 'A wind-resistant cooking fire using parallel logs as a natural stove top for safe outdoor cooking.';
+        } else if (purpose === 'warmth') {
+            fireStructure = 'reflector';
+            recipe.title = 'Reflector Warmth Fire';
+            recipe.description = 'A heat-reflecting fire design that maximizes warmth while providing wind protection.';
+        } else {
+            fireStructure = 'council';
+            recipe.title = 'Council Ambiance Fire';
+            recipe.description = 'A large, impressive fire perfect for group gatherings and creating atmosphere in open areas.';
+        }
+        recipe.illustration = '🔥 Open Ground Fire';
+    }
+    
+    // --- materials calculation (unchanged) ---
+    const baseMultiplier = Math.max(1, peopleCount / 4);
+    const timeMultiplier = burnTime / 60;
+    let materialAdjustment = 1;
+    if (infrastructure === 'fireplace' || infrastructure === 'wood-stove') {
+        materialAdjustment = 0.7;
+    } else if (infrastructure === 'no-area') {
+        materialAdjustment = 1.3;
+    }
+    recipe.materials = [
+        {
+            name: 'Tinder',
+            amount: infrastructure === 'fireplace' ? 'Fire starter cubes' : '2-3 handfuls',
+            icon: infrastructure === 'fireplace' ? '🧊' : '🍂',
+            description: infrastructure === 'fireplace' ? 'Commercial fire starters or newspaper' : 'Dry grass, paper, birch bark'
+        },
+        {
+            name: 'Kindling',
+            amount: Math.ceil(10 * baseMultiplier * materialAdjustment) + ' pieces',
+            icon: '🪵',
+            description: 'Pencil to thumb thickness'
+        },
+        {
+            name: 'Small Logs',
+            amount: Math.ceil(8 * baseMultiplier * timeMultiplier * materialAdjustment) + ' pieces',
+            icon: '🪓',
+            description: infrastructure === 'wood-stove' ? '1-2 inch diameter, split' : '1-2 inch diameter'
+        },
+        {
+            name: 'Medium Logs',
+            amount: Math.ceil(6 * baseMultiplier * timeMultiplier * materialAdjustment) + ' pieces',
+            icon: '🌳',
+            description: infrastructure === 'wood-stove' ? '3-4 inch diameter, seasoned' : '3-4 inch diameter'
+        },
+        {
+            name: 'Large Logs',
+            amount: Math.ceil(4 * baseMultiplier * timeMultiplier * materialAdjustment) + ' pieces',
+            icon: '🪵',
+            description: infrastructure === 'wood-stove' ? '5+ inch diameter, well-seasoned' : '5+ inch diameter'
+        },
+        {
+            name: infrastructure === 'fireplace' ? 'Fireplace Screen' : 'Water',
+            amount: infrastructure === 'fireplace' ? '1 unit' : Math.ceil(2 * baseMultiplier) + ' gallons',
+            icon: infrastructure === 'fireplace' ? '🛡️' : '💧',
+            description: infrastructure === 'fireplace' ? 'For spark protection' : 'For extinguishing'
+        },
+        {
+            name: 'Lighter/Matches',
+            amount: '1 set',
+            icon: '🔥',
+            description: infrastructure === 'fireplace' ? 'Long fireplace lighter preferred' : 'Waterproof preferred'
+        }
+    ];
+    if (infrastructure === 'no-area') {
+        recipe.materials.push({ name: 'Shovel & Rocks', amount: '1 shovel + 20 rocks', icon: '🪨', description: 'For fire ring construction' });
+    } else if (infrastructure === 'fireplace') {
+        recipe.materials.push({ name: 'Ash Shovel', amount: '1 unit', icon: '🥄', description: 'For ash removal' });
+    }
+
+    // Generate steps based on fire structure and infrastructure
+    if (fireStructure === 'fireplace-cabin') {
+        recipe.steps = [
+            {
+                title: 'Preparation',
+                instruction: 'Open the damper completely and ensure the chimney is clear. Place the fireplace screen to the side. Remove old ash if necessary.',
+                endState: 'Fireplace is clean and ready, with proper ventilation established.',
+                illustration: 'Clean fireplace with open damper'
+            },
+            {
+                title: 'Foundation Layer',
+                instruction: 'Place two medium logs parallel across the andirons or grate, leaving 6-8 inches between them. These form your base.',
+                endState: 'Two logs are positioned parallel, creating a stable foundation with airflow underneath.',
+                illustration: 'Parallel logs on andirons'
+            },
+            {
+                title: 'Kindling Nest',
+                instruction: 'Place fire starter cubes or crumpled newspaper in the center. Build a small kindling nest on top, leaving gaps for airflow.',
+                endState: 'Tinder and kindling are arranged in the center with good ventilation.',
+                illustration: 'Kindling nest on foundation'
+            },
+            {
+                title: 'Log Cabin Build',
+                instruction: 'Place two smaller logs perpendicular on top of the base logs. Continue alternating directions with each layer, building up.',
+                endState: 'A log cabin structure is built up with 3-4 layers, maintaining gaps for airflow.',
+                illustration: 'Multi-layer log cabin structure'
+            },
+            {
+                title: 'Ignition & Screen',
+                instruction: 'Light the tinder from multiple points. Once flames are established, place the fireplace screen for safety.',
+                endState: 'Fire is burning well with screen in place, providing warmth and ambiance safely.',
+                illustration: 'Protected fireplace fire'
+            }
+        ];
+    } else if (fireStructure === 'wood-stove') {
+        recipe.steps = [
+            {
+                title: 'Stove Preparation',
+                instruction: 'Ensure air vents are open and the stove is clean of ash. Open the door and check that the flue is clear.',
+                endState: 'Wood stove is ready with proper airflow and clean burning chamber.',
+                illustration: 'Prepared wood stove'
+            },
+            {
+                title: 'Top-Down Base',
+                instruction: 'Place largest logs on the bottom of the firebox, running front to back. These will burn last and provide long heat.',
+                endState: 'Large logs form the base layer of fuel in the stove.',
+                illustration: 'Large logs as foundation'
+            },
+            {
+                title: 'Medium Layer',
+                instruction: 'Add medium logs perpendicular to the base layer. Then add small logs perpendicular to medium ones.',
+                endState: 'Multiple layers create a stable fuel stack with decreasing log sizes toward the top.',
+                illustration: 'Layered log structure'
+            },
+            {
+                title: 'Kindling & Tinder Top',
+                instruction: 'Top the stack with kindling and fire starter. This top-down method burns cleanly and requires minimal tending.',
+                endState: 'Fire materials are stacked with finest fuel on top, ready to light.',
+                illustration: 'Complete top-down load'
+            },
+            {
+                title: 'Light & Adjust',
+                instruction: 'Light the top layer and close the door. Adjust air vents as fire establishes - reduce for longer burn.',
+                endState: 'Fire burns from top down, providing steady, efficient heat for hours.',
+                illustration: 'Burning top-down fire'
+            }
+        ];
+    } else if (fireStructure === 'platform') {
+        recipe.steps = [
+            {
+                title: 'Platform Base',
+                instruction: 'In your metal fire pit, lay large logs side by side to create a flat platform base. This elevates the cooking fire.',
+                endState: 'A stable platform of logs provides the foundation for cooking.',
+                illustration: 'Log platform in fire pit'
+            },
+            {
+                title: 'Cross Layer',
+                instruction: 'Place medium logs perpendicular across the platform base, creating a grid pattern with gaps for airflow.',
+                endState: 'Cross-hatched log structure provides good ventilation and cooking surface.',
+                illustration: 'Cross-hatched log grid'
+            },
+            {
+                title: 'Tinder Placement',
+                instruction: 'Place tinder and kindling in the gaps of your platform structure, focusing on the center area.',
+                endState: 'Fire starting materials are distributed through the platform gaps.',
+                illustration: 'Tinder in platform gaps'
+            },
+            {
+                title: 'Top Cooking Layer',
+                instruction: 'Add a final layer of small to medium logs across the top, creating your cooking surface.',
+                endState: 'A flat, stable cooking surface is ready above the fire structure.',
+                illustration: 'Flat cooking surface'
+            },
+            {
+                title: 'Light & Cook',
+                instruction: 'Light the tinder from below. As it burns up through the platform, you\'ll have perfect cooking coals on top.',
+                endState: 'Platform burns to create an ideal flat bed of coals for cooking.',
+                illustration: 'Cooking coals on platform'
+            }
+        ];
+    } else if (fireStructure === 'parallel') {
+        recipe.steps = [
+            {
+                title: 'Site Preparation',
+                instruction: 'Clear a 10-foot circle of flammable materials. Build a ring with rocks if no fire ring exists.',
+                endState: 'Safe fire area is prepared with wind protection and safety clearance.',
+                illustration: 'Cleared and ringed fire site'
+            },
+            {
+                title: 'Parallel Base Logs',
+                instruction: 'Place two large logs parallel to each other, about 8 inches apart. Orient them perpendicular to the wind direction.',
+                endState: 'Two logs create a wind-resistant channel for cooking.',
+                illustration: 'Parallel logs as windbreaks'
+            },
+            {
+                title: 'Kindling Between',
+                instruction: 'Build your kindling fire in the protected channel between the logs, starting with tinder in the center.',
+                endState: 'Fire is started in the wind-protected space between the parallel logs.',
+                illustration: 'Fire between parallel logs'
+            },
+            {
+                title: 'Fuel Addition',
+                instruction: 'Add small and medium logs perpendicular to the base logs, building up the cooking area gradually.',
+                endState: 'Fire builds between the logs, creating a natural stove top.',
+                illustration: 'Built-up cooking fire'
+            },
+            {
+                title: 'Cooking Setup',
+                instruction: 'The parallel logs now serve as pot supports. Place cookware directly on the logs over the fire.',
+                endState: 'A functional outdoor stove with wind protection and stable pot supports.',
+                illustration: 'Cookware on log supports'
+            }
+        ];
+    } else if (fireStructure === 'reflector') {
+        recipe.steps = [
+            {
+                title: 'Reflector Wall',
+                instruction: 'Build a reflector wall with rocks or logs behind your fire site, angled slightly forward to direct heat.',
+                endState: 'Heat-reflecting wall is positioned to maximize warmth toward seating area.',
+                illustration: 'Angled reflector wall'
+            },
+            {
+                title: 'Base Fire Layout',
+                instruction: 'Build a standard teepee fire in front of the reflector wall, using the wall as a windbreak.',
+                endState: 'Teepee structure is positioned to benefit from wind protection and heat reflection.',
+                illustration: 'Teepee against reflector'
+            },
+            {
+                title: 'Gradual Building',
+                instruction: 'Start with kindling teepee, then add progressively larger logs maintaining the cone shape.',
+                endState: 'Fire grows into a substantial heat source with maximum radiation efficiency.',
+                illustration: 'Large reflector fire'
+            },
+            {
+                title: 'Heat Optimization',
+                instruction: 'Position yourself between the fire and reflector wall to benefit from both direct and reflected heat.',
+                illustration: 'Person enjoying reflected warmth'
+            }
+        ];
+    } else if (fireStructure === 'teepee') {
+        recipe.steps = [
+            {
+                title: 'Tinder Pile',
+                instruction: 'Place a small pile of tinder (dry grass, bark, or paper) at the center of your fire area.',
+                endState: 'A loose tinder pile sits in the middle, ready to ignite.',
+                illustration: 'Tinder pile at center'
+            },
+            {
+                title: 'Kindling Cone',
+                instruction: 'Lean kindling sticks upright around the tinder, forming a cone-shaped teepee. Leave an opening on the windward side.',
+                endState: 'A teepee of kindling surrounds the tinder with airflow access.',
+                illustration: 'Kindling cone structure'
+            },
+            {
+                title: 'Add Small Logs',
+                instruction: 'Once the cone shape is formed, lean small logs against the kindling structure in the same teepee pattern.',
+                endState: 'Larger teepee structure is stable and open to airflow.',
+                illustration: 'Small logs in teepee form'
+            },
+            {
+                title: 'Ignition',
+                instruction: 'Light the tinder from the open side. The flames will rise up through the kindling and ignite the logs.',
+                endState: 'Fire grows upward, radiating heat strongly in all directions.',
+                illustration: 'Flames rising in teepee'
+            }
+        ];
+    } else if (fireStructure === 'log-cabin') {
+        recipe.steps = [
+            {
+                title: 'Base Logs',
+                instruction: 'Lay two medium logs parallel on the ground, spaced about a foot apart.',
+                endState: 'Two logs form the foundation for the log cabin.',
+                illustration: 'Parallel logs as base'
+            },
+            {
+                title: 'Cross Logs',
+                instruction: 'Place two medium logs perpendicular across the base, forming a square.',
+                endState: 'A square base is created with logs in a cabin-like pattern.',
+                illustration: 'Square base of logs'
+            },
+            {
+                title: 'Build Up Layers',
+                instruction: 'Continue alternating logs in perpendicular layers, leaving space in the middle.',
+                endState: 'Cabin-like structure grows 3–4 layers high with open center.',
+                illustration: 'Stacked log cabin'
+            },
+            {
+                title: 'Tinder & Kindling Center',
+                instruction: 'Place tinder and kindling pile inside the central space of the cabin.',
+                endState: 'Fire-starting materials are contained inside the cabin structure.',
+                illustration: 'Tinder inside cabin'
+            },
+            {
+                title: 'Ignition',
+                instruction: 'Light the tinder in the center. Flames spread to kindling and logs evenly.',
+                endState: 'Fire burns evenly, creating steady coals for cooking or ambiance.',
+                illustration: 'Burning log cabin fire'
+            }
+        ];
+    } else if (fireStructure === 'lean-to') {
+        recipe.steps = [
+            {
+                title: 'Support Log',
+                instruction: 'Place a large log or branch on the ground, oriented into the wind. This acts as a windbreak and support.',
+                endState: 'A support log is positioned as base and wind shield.',
+                illustration: 'Large support log on ground'
+            },
+            {
+                title: 'Tinder Placement',
+                instruction: 'Place a pile of tinder against the base of the support log on the sheltered side.',
+                endState: 'Tinder sits protected at the base of the log.',
+                illustration: 'Tinder beside support log'
+            },
+            {
+                title: 'Lean Kindling',
+                instruction: 'Lean kindling sticks against the support log, covering the tinder but leaving airflow gaps.',
+                endState: 'Kindling leans in angled fashion against log, creating a lean-to.',
+                illustration: 'Kindling lean-to structure'
+            },
+            {
+                title: 'Add Small Logs',
+                instruction: 'Gradually lean small logs against the structure as it catches fire.',
+                endState: 'Lean-to fire grows steadily, angled away from the wind.',
+                illustration: 'Flames under lean-to'
+            },
+            {
+                title: 'Ignition',
+                instruction: 'Light the tinder at the base. Fire climbs into the kindling and then the logs.',
+                endState: 'Controlled fire burns with wind protection and steady flame.',
+                illustration: 'Burning lean-to fire'
+            }
+        ];
+    } else if (fireStructure === 'council') {
+        recipe.steps = [
+            {
+                title: 'Central Tinder',
+                instruction: 'Place a large pile of tinder in the center of your fire area.',
+                endState: 'A dense tinder pile is ready at the center.',
+                illustration: 'Large tinder pile'
+            },
+            {
+                title: 'Kindling Cone',
+                instruction: 'Build a large teepee of kindling sticks around the tinder.',
+                endState: 'Kindling teepee structure encircles the tinder.',
+                illustration: 'Kindling teepee structure'
+            },
+            {
+                title: 'Log Cabin Outer Ring',
+                instruction: 'Around the teepee, stack larger logs in a cabin-like square structure, leaving the middle open.',
+                endState: 'Outer square log walls surround the inner teepee.',
+                illustration: 'Cabin ring around teepee'
+            },
+            {
+                title: 'Additional Layers',
+                instruction: 'Continue stacking logs outward, creating a massive multi-layered fire with air gaps.',
+                endState: 'Large structure builds upward, suited for gatherings.',
+                illustration: 'Multi-layer council fire'
+            },
+            {
+                title: 'Ignition',
+                instruction: 'Light the tinder in the center. Fire spreads through the teepee and into the surrounding structure.',
+                endState: 'A roaring, long-lasting blaze illuminates the gathering.',
+                illustration: 'Huge burning council fire'
+            }
+        ];
+    }
+
+    recipe.safetyNote = infrastructure === 'fireplace'
+        ? 'Always keep the fireplace screen closed when burning. Ensure chimney is clear.'
+        : 'Never leave your fire unattended. Fully extinguish with water and stir before leaving.';
+
+    return recipe;
+}
 
         function createFireRecipe(burnTime, peopleCount, purpose, infrastructure) {
             const recipe = {
@@ -496,38 +926,234 @@
                 }
             ];
             
-            // Generate steps based on fire structure
-            if (fireStructure === 'log-cabin') {
-            } else if (fireStructure === 'log-cabin') {
-                // Standard outdoor log cabin fire for cooking
+            // Generate steps based on fire structure and infrastructure
+            if (fireStructure === 'fireplace-cabin') {
                 recipe.steps = [
                     {
-                        title: 'Layer 1: Foundation',
+                        title: 'Preparation',
+                        instruction: 'Open the damper completely and ensure the chimney is clear. Place the fireplace screen to the side. Remove old ash if necessary.',
+                        endState: 'Fireplace is clean and ready, with proper ventilation established.',
+                        illustration: 'Clean fireplace with open damper'
+                    },
+                    {
+                        title: 'Foundation Layer',
+                        instruction: 'Place two medium logs parallel across the andirons or grate, leaving 6-8 inches between them. These form your base.',
+                        endState: 'Two logs are positioned parallel, creating a stable foundation with airflow underneath.',
+                        illustration: 'Parallel logs on andirons'
+                    },
+                    {
+                        title: 'Kindling Nest',
+                        instruction: 'Place fire starter cubes or crumpled newspaper in the center. Build a small kindling nest on top, leaving gaps for airflow.',
+                        endState: 'Tinder and kindling are arranged in the center with good ventilation.',
+                        illustration: 'Kindling nest on foundation'
+                    },
+                    {
+                        title: 'Log Cabin Build',
+                        instruction: 'Place two smaller logs perpendicular on top of the base logs. Continue alternating directions with each layer, building up.',
+                        endState: 'A log cabin structure is built up with 3-4 layers, maintaining gaps for airflow.',
+                        illustration: 'Multi-layer log cabin structure'
+                    },
+                    {
+                        title: 'Ignition & Screen',
+                        instruction: 'Light the tinder from multiple points. Once flames are established, place the fireplace screen for safety.',
+                        endState: 'Fire is burning well with screen in place, providing warmth and ambiance safely.',
+                        illustration: 'Protected fireplace fire'
+                    }
+                ];
+            } else if (fireStructure === 'wood-stove') {
+                recipe.steps = [
+                    {
+                        title: 'Stove Preparation',
+                        instruction: 'Ensure air vents are open and the stove is clean of ash. Open the door and check that the flue is clear.',
+                        endState: 'Wood stove is ready with proper airflow and clean burning chamber.',
+                        illustration: 'Prepared wood stove'
+                    },
+                    {
+                        title: 'Top-Down Base',
+                        instruction: 'Place largest logs on the bottom of the firebox, running front to back. These will burn last and provide long heat.',
+                        endState: 'Large logs form the base layer of fuel in the stove.',
+                        illustration: 'Large logs as foundation'
+                    },
+                    {
+                        title: 'Medium Layer',
+                        instruction: 'Add medium logs perpendicular to the base layer. Then add small logs perpendicular to medium ones.',
+                        endState: 'Multiple layers create a stable fuel stack with decreasing log sizes toward the top.',
+                        illustration: 'Layered log structure'
+                    },
+                    {
+                        title: 'Kindling & Tinder Top',
+                        instruction: 'Top the stack with kindling and fire starter. This top-down method burns cleanly and requires minimal tending.',
+                        endState: 'Fire materials are stacked with finest fuel on top, ready to light.',
+                        illustration: 'Complete top-down load'
+                    },
+                    {
+                        title: 'Light & Adjust',
+                        instruction: 'Light the top layer and close the door. Adjust air vents as fire establishes - reduce for longer burn.',
+                        endState: 'Fire burns from top down, providing steady, efficient heat for hours.',
+                        illustration: 'Burning top-down fire'
+                    }
+                ];
+            } else if (fireStructure === 'platform') {
+                recipe.steps = [
+                    {
+                        title: 'Platform Base',
+                        instruction: 'In your metal fire pit, lay large logs side by side to create a flat platform base. This elevates the cooking fire.',
+                        endState: 'A stable platform of logs provides the foundation for cooking.',
+                        illustration: 'Log platform in fire pit'
+                    },
+                    {
+                        title: 'Cross Layer',
+                        instruction: 'Place medium logs perpendicular across the platform base, creating a grid pattern with gaps for airflow.',
+                        endState: 'Cross-hatched log structure provides good ventilation and cooking surface.',
+                        illustration: 'Cross-hatched log grid'
+                    },
+                    {
+                        title: 'Tinder Placement',
+                        instruction: 'Place tinder and kindling in the gaps of your platform structure, focusing on the center area.',
+                        endState: 'Fire starting materials are distributed through the platform gaps.',
+                        illustration: 'Tinder in platform gaps'
+                    },
+                    {
+                        title: 'Top Cooking Layer',
+                        instruction: 'Add a final layer of small to medium logs across the top, creating your cooking surface.',
+                        endState: 'A flat, stable cooking surface is ready above the fire structure.',
+                        illustration: 'Flat cooking surface'
+                    },
+                    {
+                        title: 'Light & Cook',
+                        instruction: 'Light the tinder from below. As it burns up through the platform, you\'ll have perfect cooking coals on top.',
+                        endState: 'Platform burns to create an ideal flat bed of coals for cooking.',
+                        illustration: 'Cooking coals on platform'
+                    }
+                ];
+            } else if (fireStructure === 'parallel') {
+                recipe.steps = [
+                    {
+                        title: 'Site Preparation',
+                        instruction: 'Clear a 10-foot circle of flammable materials. Build a ring with rocks if no fire ring exists.',
+                        endState: 'Safe fire area is prepared with wind protection and safety clearance.',
+                        illustration: 'Cleared and ringed fire site'
+                    },
+                    {
+                        title: 'Parallel Base Logs',
+                        instruction: 'Place two large logs parallel to each other, about 8 inches apart. Orient them perpendicular to the wind direction.',
+                        endState: 'Two logs create a wind-resistant channel for cooking.',
+                        illustration: 'Parallel logs as windbreaks'
+                    },
+                    {
+                        title: 'Kindling Between',
+                        instruction: 'Build your kindling fire in the protected channel between the logs, starting with tinder in the center.',
+                        endState: 'Fire is started in the wind-protected space between the parallel logs.',
+                        illustration: 'Fire between parallel logs'
+                    },
+                    {
+                        title: 'Fuel Addition',
+                        instruction: 'Add small and medium logs perpendicular to the base logs, building up the cooking area gradually.',
+                        endState: 'Fire builds between the logs, creating a natural stove top.',
+                        illustration: 'Built-up cooking fire'
+                    },
+                    {
+                        title: 'Cooking Setup',
+                        instruction: 'The parallel logs now serve as pot supports. Place cookware directly on the logs over the fire.',
+                        endState: 'A functional outdoor stove with wind protection and stable pot supports.',
+                        illustration: 'Cookware on log supports'
+                    }
+                ];
+            } else if (fireStructure === 'reflector') {
+                recipe.steps = [
+                    {
+                        title: 'Reflector Wall',
+                        instruction: 'Build a reflector wall with rocks or logs behind your fire site, angled slightly forward to direct heat.',
+                        endState: 'Heat-reflecting wall is positioned to maximize warmth toward seating area.',
+                        illustration: 'Angled reflector wall'
+                    },
+                    {
+                        title: 'Base Fire Layout',
+                        instruction: 'Build a standard teepee fire in front of the reflector wall, using the wall as a windbreak.',
+                        endState: 'Teepee structure is positioned to benefit from wind protection and heat reflection.',
+                        illustration: 'Teepee against reflector'
+                    },
+                    {
+                        title: 'Gradual Building',
+                        instruction: 'Start with kindling teepee, then add progressively larger logs maintaining the cone shape.',
+                        endState: 'Fire grows into a substantial heat source with maximum radiation efficiency.',
+                        illustration: 'Large reflector fire'
+                    },
+                    {
+                        title: 'Heat Optimization',
+                        instruction: 'Position yourself between the fire and reflector wall to benefit from both direct and reflected heat.',
+                        endState: 'Maximum warmth is achieved through combined direct and reflected heat.',
+                        illustration: 'Optimal heat positioning'
+                    },
+                    {
+                        title: 'Maintenance',
+                        instruction: 'Keep adding fuel to maintain the teepee shape. The reflector doubles your effective heat output.',
+                        endState: 'Sustained high heat output with efficient fuel use and wind protection.',
+                        illustration: 'Maintained reflector system'
+                    }
+                ];
+            } else if (fireStructure === 'council') {
+                recipe.steps = [
+                    {
+                        title: 'Large Site Prep',
+                        instruction: 'Create a large fire ring with rocks and clear at least 15 feet around. This will be a substantial fire.',
+                        endState: 'Large, safe fire area prepared for a significant group gathering fire.',
+                        illustration: 'Large cleared fire site'
+                    },
+                    {
+                        title: 'Foundation Logs',
+                        instruction: 'Place 4-6 large logs in a star pattern, with ends meeting in the center like wheel spokes.',
+                        endState: 'Star pattern foundation provides stable base and allows fire to be fed by pushing logs inward.',
+                        illustration: 'Star pattern log foundation'
+                    },
+                    {
+                        title: 'Central Fire Build',
+                        instruction: 'Build a large teepee fire in the center where all the log ends meet.',
+                        endState: 'Central fire will burn outward along the foundation logs.',
+                        illustration: 'Central teepee ignition'
+                    },
+                    {
+                        title: 'Light & Spread',
+                        instruction: 'Light the central teepee. As it burns down, push the star logs inward to maintain the fire.',
+                        endState: 'Fire spreads along the star pattern, creating a large, impressive display.',
+                        illustration: 'Burning star pattern'
+                    },
+                    {
+                        title: 'Group Management',
+                        instruction: 'Maintain by occasionally pushing logs toward center. Perfect for large groups and long gatherings.',
+                        endState: 'Long-burning, impressive fire suitable for group activities and ambiance.',
+                        illustration: 'Large group gathering fire'
+                    }
+                ];
+            } else if (fireStructure === 'log-cabin') {
+                recipe.steps = [
+                    {
+                        title: 'Foundation Layer',
                         instruction: 'Place two medium logs parallel to each other, about 12 inches apart. This creates the base of your log cabin structure.',
                         endState: 'Two logs are positioned parallel, creating a foundation with space between them.',
-                        illustration: 'Bird\'s eye: Two parallel lines'
+                        illustration: 'Parallel log foundation'
                     },
                     {
-                        title: 'Layer 2: Tinder Nest',
+                        title: 'Tinder Nest',
                         instruction: 'In the center space between the logs, create a small nest of tinder. Add kindling in a loose teepee shape around the tinder.',
                         endState: 'Tinder nest is prepared and kindling forms a small teepee in the center.',
-                        illustration: 'Tinder nest with kindling teepee'
+                        illustration: 'Central tinder and kindling'
                     },
                     {
-                        title: 'Layer 3: Cross Pattern',
+                        title: 'Cross Pattern Build',
                         instruction: 'Place two more medium logs perpendicular to the first pair, on top of them. Continue alternating directions with each layer.',
                         endState: 'Logs form a square cabin shape with 2-3 layers built up.',
-                        illustration: 'Cross-hatched log pattern'
+                        illustration: 'Cross-hatched log structure'
                     },
                     {
-                        title: 'Layer 4: Ignition',
+                        title: 'Ignition',
                         instruction: 'Light the tinder in the center. As it catches, the kindling will ignite, then the inner parts of the logs.',
                         endState: 'Fire is burning steadily in the center, with flames beginning to catch the log structure.',
                         illustration: 'Central fire spreading outward'
                     },
                     {
-                        title: 'Layer 5: Maintenance',
-                        instruction: 'As logs burn down, add new logs in the same crisscross pattern. This maintains the flat cooking surface.',
+                        title: 'Maintenance',
+                        instruction: 'As logs burn down, add new logs in the same crisscross pattern. This maintains the stable cooking surface.',
                         endState: 'Fire burns with consistent coals perfect for cooking, with a stable base of embers.',
                         illustration: 'Steady cooking coals'
                     }
@@ -535,81 +1161,107 @@
             } else if (fireStructure === 'teepee') {
                 recipe.steps = [
                     {
-                        title: 'Layer 1: Tinder Bundle',
+                        title: 'Tinder Bundle',
                         instruction: 'Create a small bundle of tinder in the center of your fire area. This will be the heart of your fire.',
                         endState: 'A compact bundle of fine tinder is ready to ignite.',
-                        illustration: 'Small central tinder bundle'
+                        illustration: 'Central tinder bundle'
                     },
                     {
-                        title: 'Layer 2: Kindling Teepee',
+                        title: 'Kindling Teepee',
                         instruction: 'Arrange kindling around the tinder in a teepee shape, leaving gaps for airflow. Start with the smallest pieces closest to the tinder.',
                         endState: 'Kindling forms a cone shape around tinder with good ventilation.',
-                        illustration: 'Kindling teepee structure'
+                        illustration: 'Kindling teepee cone'
                     },
                     {
-                        title: 'Layer 3: Small Log Teepee',
+                        title: 'Small Log Teepee',
                         instruction: 'Add small logs around the kindling teepee, maintaining the cone shape but with larger gaps for oxygen.',
                         endState: 'A larger teepee structure is formed with multiple size gradients.',
-                        illustration: 'Expanded teepee with logs'
+                        illustration: 'Multi-layer teepee'
                     },
                     {
-                        title: 'Layer 4: Ignition',
+                        title: 'Ignition',
                         instruction: 'Light the tinder through the gaps in your teepee. The fire should climb naturally up through the structure.',
                         endState: 'Fire is burning upward through the teepee, with flames visible at multiple levels.',
-                        illustration: 'Flames climbing through teepee'
+                        illustration: 'Climbing teepee flames'
                     },
                     {
-                        title: 'Layer 5: Building Height',
+                        title: 'Height Building',
                         instruction: 'As the fire establishes, add medium and large logs to maintain the teepee shape, creating maximum heat radiation.',
                         endState: 'A tall, hot fire providing excellent warmth in all directions.',
-                        illustration: 'Tall teepee fire radiating heat'
+                        illustration: 'Tall radiating teepee fire'
                     }
                 ];
             } else { // lean-to
                 recipe.steps = [
                     {
-                        title: 'Layer 1: Backstop Log',
+                        title: 'Backstop Log',
                         instruction: 'Place one large log as a backstop. This will reflect heat and support the leaning structure.',
                         endState: 'One large log is positioned to serve as the back wall of your fire.',
-                        illustration: 'Single horizontal log'
+                        illustration: 'Single backstop log'
                     },
                     {
-                        title: 'Layer 2: Tinder Placement',
+                        title: 'Tinder Placement',
                         instruction: 'Place tinder against the backstop log, creating a small nest at the base.',
                         endState: 'Tinder is positioned against the backstop, ready to ignite.',
                         illustration: 'Tinder against backstop'
                     },
                     {
-                        title: 'Layer 3: Kindling Lean',
+                        title: 'Kindling Lean',
                         instruction: 'Lean kindling against the backstop log at a 45-degree angle, covering the tinder but leaving gaps for air.',
                         endState: 'Kindling creates an angled roof over the tinder.',
-                        illustration: 'Angled kindling lean-to'
+                        illustration: 'Angled kindling lean'
                     },
                     {
-                        title: 'Layer 4: Log Lean Structure',
+                        title: 'Log Lean Structure',
                         instruction: 'Continue adding progressively larger logs in the same leaning pattern, creating a sloped wall of fuel.',
                         endState: 'A complete lean-to structure with multiple log sizes.',
-                        illustration: 'Full lean-to structure'
+                        illustration: 'Complete lean-to structure'
                     },
                     {
-                        title: 'Layer 5: Ignition & Ambiance',
+                        title: 'Ignition & Ambiance',
                         instruction: 'Light the tinder at the base. The fire will burn up the lean-to, creating beautiful dancing flames perfect for ambiance.',
                         endState: 'Fire burns with attractive flames and provides a cozy, atmospheric glow.',
-                        illustration: 'Dancing flames in lean-to'
+                        illustration: 'Dancing lean-to flames'
                     }
                 ];
             }
             
-            // Safety note based on infrastructure
-            if (infrastructure === 'no-area') {
-                recipe.safetyNote = 'Clear a 10-foot radius of flammable materials. Have extra water and a shovel ready. Check local fire restrictions.';
-            } else if (infrastructure === 'fireplace') {
-                recipe.safetyNote = 'Ensure chimney is clean and damper is open. Use a fireplace screen and keep the area clear.';
-            } else {
-                recipe.safetyNote = 'Always keep water nearby for extinguishing. Never leave fire unattended. Fully extinguish before leaving.';
-            }
-            
-            return recipe;
+           
+    // Safety note based on infrastructure
+    if (infrastructure === 'no-area') {
+        recipe.safetyNote = 'Clear at least a 10-foot radius of flammable materials. Never build under low branches. Keep extra water and a shovel nearby. Always check local fire restrictions before lighting.';
+    } else if (infrastructure === 'fire-ring') {
+        recipe.safetyNote = 'Stay within the fire ring boundary. Keep seating and gear a safe distance away. Have water and a shovel ready to control or extinguish the fire.';
+    } else if (infrastructure === 'metal-pit') {
+        recipe.safetyNote = 'Ensure your pit is placed on non-flammable ground. Keep the lid or screen nearby. Do not overload with large logs—metal can overheat. Always have water on hand.';
+    } else if (infrastructure === 'fireplace') {
+        recipe.safetyNote = 'Ensure chimney is clean and damper is open before starting. Use a fireplace screen to block sparks. Never burn treated or wet wood indoors. Keep flammables at least 3 feet away.';
+    } else if (infrastructure === 'wood-stove') {
+        recipe.safetyNote = 'Burn only seasoned wood. Never use accelerants inside. Keep stove door closed except when loading. Ensure vents are adjusted for safe airflow and a carbon monoxide detector is installed.';
+    }
+
+    // Add fire-structure–specific cautions
+    if (fireStructure === 'teepee') {
+        recipe.safetyNote += ' Teepee fires burn hot and fast—add fuel gradually and supervise closely.';
+    } else if (fireStructure === 'log-cabin') {
+        recipe.safetyNote += ' Log cabin fires create large coal beds—watch for rolling embers and manage log placement carefully.';
+    } else if (fireStructure === 'lean-to') {
+        recipe.safetyNote += ' Lean-to fires should face away from the wind—improper orientation can spread sparks.';
+    } else if (fireStructure === 'council') {
+        recipe.safetyNote += ' Council fires are very large and should only be built in wide, open areas with ample clearance above and around.';
+    } else if (fireStructure === 'platform') {
+        recipe.safetyNote += ' Platform fires concentrate heat upward—ensure cookware is stable and never leave flames unattended.';
+    } else if (fireStructure === 'parallel') {
+        recipe.safetyNote += ' Parallel fires channel flames between logs—be cautious of shifting logs when they burn through.';
+    } else if (fireStructure === 'reflector') {
+        recipe.safetyNote += ' Reflector fires throw heat forward—make sure no people or gear are directly in front of the wall.';
+    } else if (fireStructure === 'fireplace-cabin') {
+        recipe.safetyNote += ' Never leave the fireplace unattended and check that sparks are fully contained by the screen.';
+    } else if (fireStructure === 'wood-stove') {
+        recipe.safetyNote += ' Do not overload the stove; maintain steady airflow to avoid creosote buildup.';
+    }
+
+    return recipe;
         }
 
         function displayRecipe(recipe) {
