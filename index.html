@@ -264,6 +264,15 @@
             background: rgba(255, 107, 53, 0.2);
         }
         
+        .radio-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .radio-option.disabled span {
+            text-decoration: line-through;
+        }
+ 
         @media (max-width: 768px) {
             .step-content {
                 grid-template-columns: 1fr;
@@ -380,6 +389,53 @@
     </div>
 
     <script>
+       // Watch for infrastructure selection changes
+        document.querySelectorAll('input[name="infrastructure"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Grab the purpose radio buttons
+                const cookingOption = document.querySelector('input[name="purpose"][value="cooking"]');
+                const ambianceOption = document.querySelector('input[name="purpose"][value="ambiance"]');
+
+                // Grab the labels (so we can style/disable them too)
+                const cookingLabel = cookingOption.closest('.radio-option');
+                const ambianceLabel = ambianceOption.closest('.radio-option');
+
+                // If the user selects "wood-stove"
+                if (this.value === 'wood-stove') {
+                    // 1. Force purpose to "warmth"
+                    document.querySelector('input[name="purpose"][value="warmth"]').checked = true;
+
+                    // 2. Disable "cooking" and "ambiance" radios
+                    cookingOption.disabled = true;
+                    ambianceOption.disabled = true;
+
+                    // 3. Add grayed-out style
+                    cookingLabel.classList.add('disabled');
+                    ambianceLabel.classList.add('disabled');
+
+                    // 4. Add tooltip explaining why
+                    cookingLabel.setAttribute('title', 'Not available for wood stoves');
+                    ambianceLabel.setAttribute('title', 'Not available for wood stoves');
+
+                } else {
+                    // If user selects ANY other infrastructure:
+                    // 1. Re-enable both options
+                    cookingOption.disabled = false;
+                    ambianceOption.disabled = false;
+
+                    // 2. Remove grayed-out style
+                    cookingLabel.classList.remove('disabled');
+                    ambianceLabel.classList.remove('disabled');
+
+                    // 3. Remove tooltips
+                    cookingLabel.removeAttribute('title');
+                    ambianceLabel.removeAttribute('title');
+                }
+            });
+        });
+
+
+
         // Update slider values
         document.getElementById('burnTime').addEventListener('input', function() {
             const value = this.value;
